@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.emptyactivity.ui.theme.AppTheme
+import com.example.emptyactivity.theme.AppTheme
 
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.navigation.compose.rememberNavController
-import com.example.emptyactivity.ui.theme.AppTheme
+import com.example.emptyactivity.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

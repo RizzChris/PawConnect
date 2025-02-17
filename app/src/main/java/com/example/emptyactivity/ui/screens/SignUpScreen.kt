@@ -7,8 +7,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,27 +21,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.emptyactivity.R
+import com.example.emptyactivity.Screen
 
 @Composable
 fun SignUpScreen(navController: NavController) {
+    // Estados para cada campo
+    var tipoCuenta by remember { mutableStateOf("Selecciona un tipo de cuenta") }
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
-    var municipio by remember { mutableStateOf("") }
-    var genero by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.background_dogs),
             contentDescription = "Fondo de perros",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
         IconButton(
             onClick = { navController.popBackStack() },
             modifier = Modifier
@@ -54,103 +62,191 @@ fun SignUpScreen(navController: NavController) {
                 tint = Color.White // Color del icono
             )
         }
-
-        Card(
-            shape = MaterialTheme.shapes.medium,
+        // Columna principal
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .align(Alignment.Center)
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            // Logo PawConnect
+            Image(
+                painter = painterResource(id = R.drawable.logo_pawconnect),
+                contentDescription = "Logo PawConnect",
+                modifier = Modifier.size(200.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Tarjeta blanca para el formulario
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             ) {
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { if (it.all { char -> char.isLetter() || char.isWhitespace() }) nombre = it },
-                    label = { Text("Nombre") },
-                    leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Nombre") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = apellido,
-                    onValueChange = { if (it.all { char -> char.isLetter() || char.isWhitespace() }) apellido = it },
-                    label = { Text("Apellido") },
-                    leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Apellido") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = telefono,
-                    onValueChange = { if (it.all { char -> char.isDigit() }) telefono = it },
-                    label = { Text("Teléfono") },
-                    leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = "Teléfono") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    DropdownMenuExample(
-                        label = "Municipio",
-                        options = listOf("CDMX", "Guadalajara", "Monterrey"),
-                        onSelection = { municipio = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                    DropdownMenuExample(
-                        label = "Género",
-                        options = listOf("Masculino", "Femenino", "Otro"),
-                        onSelection = { genero = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { println("Municipio seleccionado: $municipio, Género seleccionado: $genero") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Crear mi cuenta", fontSize = 16.sp)
+                    // Dropdown para Tipo de cuenta
+                    TipoCuentaDropdown(
+                        tipoCuentaSeleccionado = tipoCuenta,
+                        onTipoCuentaChange = { tipoCuenta = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Campo de nombre (solo letras y espacios)
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = { nuevoValor ->
+                            if (nuevoValor.all { it.isLetter() || it.isWhitespace() }) {
+                                nombre = nuevoValor
+                            }
+                        },
+                        label = { Text("Nombre") },
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Nombre") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Campo de apellido (solo letras y espacios)
+                    OutlinedTextField(
+                        value = apellido,
+                        onValueChange = { nuevoValor ->
+                            if (nuevoValor.all { it.isLetter() || it.isWhitespace() }) {
+                                apellido = nuevoValor
+                            }
+                        },
+                        label = { Text("Apellido") },
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Apellido") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Campo de correo electrónico (validación mínima de caracteres)
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { nuevoValor ->
+                            // Permitimos letras, dígitos, @, ., _, y -
+                            if (nuevoValor.matches(Regex("^[A-Za-z0-9@._-]*$"))) {
+                                email = nuevoValor
+                            }
+                        },
+                        label = { Text("Correo electrónico") },
+                        leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Correo") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Campo de teléfono (solo dígitos)
+                    OutlinedTextField(
+                        value = telefono,
+                        onValueChange = { nuevoValor ->
+                            if (nuevoValor.all { it.isDigit() }) {
+                                telefono = nuevoValor
+                            }
+                        },
+                        label = { Text("Teléfono") },
+                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = "Teléfono") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Campo de contraseña (oculta caracteres)
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Contraseña") },
+                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Contraseña") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+                        visualTransformation = PasswordVisualTransformation(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Botón "Crear mi cuenta"
+                    Button(
+                        onClick = {
+                            errorMessage = ""
+                            when {
+                                tipoCuenta.isBlank() || nombre.isBlank() || apellido.isBlank()
+                                        || email.isBlank() || telefono.isBlank() || password.isBlank() ->
+                                    errorMessage = "Por favor, completa todos los campos."
+                                else -> {
+                                    // Aquí podrías llamar a tu repositorio o ViewModel para registrar al usuario
+                                    navController.navigate(Screen.Success.route)
+
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                    ) {
+                        Text("Crear mi cuenta", fontSize = 16.sp)
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Mensaje de error
+                    if (errorMessage.isNotEmpty()) {
+                        Text(errorMessage, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }
     }
 }
 
+/**
+ * Dropdown simple para seleccionar el tipo de cuenta (por ejemplo, "Usuario" o "Refugio").
+ */
 @Composable
-fun DropdownMenuExample(
-    label: String,
-    options: List<String>,
-    onSelection: (String) -> Unit,
-    modifier: Modifier = Modifier
+fun TipoCuentaDropdown(
+    tipoCuentaSeleccionado: String,
+    onTipoCuentaChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("") }
 
-    Box(modifier = modifier) {
+    Box {
         OutlinedTextField(
-            value = selectedText,
+            value = tipoCuentaSeleccionado,
             onValueChange = {},
-            label = { Text(label) },
+            label = { Text("Tipo de cuenta") },
             readOnly = true,
             trailingIcon = {
                 IconButton(onClick = { expanded = !expanded }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Abrir menú")
+                    Icon(Icons.Filled.ArrowDropDown, contentDescription = "Desplegar menú")
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
         )
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            options.forEach { option ->
+            listOf("Usuario", "Refugio").forEach { opcion ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(opcion) },
                     onClick = {
-                        selectedText = option
-                        onSelection(option)
+                        onTipoCuentaChange(opcion)
                         expanded = false
                     }
                 )
@@ -158,6 +254,4 @@ fun DropdownMenuExample(
         }
     }
 }
-
-
 

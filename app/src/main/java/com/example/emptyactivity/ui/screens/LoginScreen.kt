@@ -1,18 +1,19 @@
 package com.example.emptyactivity.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -21,28 +22,27 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.emptyactivity.Screen
 import com.example.emptyactivity.R
+import com.example.emptyactivity.Screen
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    // Estados para cada campo
+    var tipoCuenta by remember { mutableStateOf("Selecciona tipo de cuenta") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
         Image(
-            painter = painterResource(id = R.drawable.background_dogs), // Asegúrate de agregar la imagen a res/drawable
+            painter = painterResource(id = R.drawable.background_dogs),
             contentDescription = "Fondo de perros",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
 
-        // Contenedor centrado
+        // Columna principal
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -68,16 +68,27 @@ fun LoginScreen(navController: NavController) {
                     .padding(8.dp)
             ) {
                 Column(
-                    modifier = Modifier
-                        .padding(16.dp),
+                    modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+                    TipoCuentaDropdown(
+                        tipoCuentaSeleccionado = tipoCuenta,
+                        onTipoCuentaChange = { tipoCuenta = it }
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     // Campo de correo electrónico
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = { nuevoValor ->
+                            // Permitimos letras, dígitos, @, ., _ y -
+                            if (nuevoValor.matches(Regex("^[A-Za-z0-9@._-]*$"))) {
+                                email = nuevoValor
+                            }
+                        },
                         label = { Text("Correo electrónico") },
-                        leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email") },
+                        leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Correo") },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                         shape = RoundedCornerShape(12.dp)
@@ -85,106 +96,63 @@ fun LoginScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Campo de contraseña
+                    // Campo de contraseña (oculta caracteres)
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Contraseña") },
-                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Password") },
+                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Contraseña") },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                         visualTransformation = PasswordVisualTransformation(),
                         shape = RoundedCornerShape(12.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // Mantener sesión iniciada
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(checked = true, onCheckedChange = {})
-                        Text("Mantener la sesión iniciada")
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Botón de login
+                    // Botón "Iniciar Sesión"
                     Button(
                         onClick = {
-                            if (email.isEmpty() || password.isEmpty()) {
-                                errorMessage = "Por favor ingresa todos los campos"
-                            } else {
-                                navController.navigate(Screen.Home.route)
+                            errorMessage = ""
+                            when {
+                                tipoCuenta == "Selecciona tipo de cuenta" ||
+                                        email.isBlank() || password.isBlank() ->
+                                    errorMessage = "Por favor, completa todos los campos."
+                                !isValidEmail(email) ->
+                                    errorMessage = "El correo electrónico no es válido."
+                                else -> {
+                                    navController.navigate(Screen.Home.route)
+                                }
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
                     ) {
-                        Text("Iniciar sesión", fontSize = 16.sp)
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Mensaje de error
-                    if (errorMessage.isNotEmpty()) {
-                        Text(errorMessage, color = MaterialTheme.colorScheme.error)
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Botones de redes sociales
-                    Text("Registrarse con", fontSize = 14.sp, color = Color.Gray)
-                    Spacer(modifier = Modifier.height(5.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.icon_facebook),
-                            contentDescription = "Facebook",
-                            modifier = Modifier
-                                .size(90.dp)
-                                .clickable { /* Acción de Facebook */ }
-                        )
-
-                        Spacer(modifier = Modifier.width(20.dp)) // Aumenta el espacio entre iconos
-
-                        Image(
-                            painter = painterResource(id = R.drawable.icon_google),
-                            contentDescription = "Google",
-                            modifier = Modifier
-                                .size(90.dp)
-                                .clickable { /* Acción de Google */ }
-                        )
-
-                        Spacer(modifier = Modifier.width(20.dp)) // Espacio entre iconos
-
-                        Image(
-                            painter = painterResource(id = R.drawable.icon_apple),
-                            contentDescription = "Apple",
-                            modifier = Modifier
-                                .size(90.dp)
-                                .clickable { /* Acción de Apple */ }
-                        )
+                        Text("Iniciar Sesión", fontSize = 16.sp)
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
                     // Link de registro
                     Text(
-                        text = "¿No tienes una cuenta? Regístrate aquí",
+                        text = "¿No tienes una cuenta? -> Regístrate aquí",
                         color = Color.Blue,
                         modifier = Modifier
-                            .clickable { navController.navigate(Screen.Register.route) } // ← Aquí navega a RegisterScreen
+                            .clickable { navController.navigate(Screen.Register.route) }
                             .padding(8.dp)
                     )
 
+                    // Mensaje de error
+                    if (errorMessage.isNotEmpty()) {
+                        Text(errorMessage, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }
     }
 }
 
+fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}

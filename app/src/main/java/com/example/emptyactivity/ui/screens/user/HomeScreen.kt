@@ -1,4 +1,4 @@
-package com.example.emptyactivity.ui.screens
+package com.example.emptyactivity.ui.screens.user
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
