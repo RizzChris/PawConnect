@@ -121,7 +121,11 @@ fun LoginScreen(navController: NavController) {
                                 !isValidEmail(email) ->
                                     errorMessage = "El correo electrónico no es válido."
                                 else -> {
-                                    navController.navigate(Screen.Home.route)
+                                    if (email == "refugio@gmail.com" && password == "123") {
+                                        navController.navigate(Screen.ShelterHome.route)
+                                    } else {
+                                        navController.navigate(Screen.Home.route)
+                                    }
                                 }
                             }
                         },
