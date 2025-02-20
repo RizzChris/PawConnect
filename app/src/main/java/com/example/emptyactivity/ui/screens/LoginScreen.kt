@@ -124,7 +124,7 @@ fun LoginScreen(navController: NavController) {
                                     if (email == "refugio@gmail.com" && password == "123") {
                                         navController.navigate(Screen.ShelterHome.route)
                                     } else {
-                                        navController.navigate(Screen.Home.route)
+                                        navController.navigate(Screen.UserHome.route)
                                     }
                                 }
                             }
