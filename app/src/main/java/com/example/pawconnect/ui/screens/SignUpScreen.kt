@@ -1,22 +1,16 @@
 package com.example.pawconnect.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -27,6 +21,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pawconnect.Screen
 import com.example.pawconnect.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun SignUpScreen(navController: NavController) {
@@ -39,6 +36,9 @@ fun SignUpScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
+    val auth = FirebaseAuth.getInstance() // FirebaseAuth instance
+    val firestore = FirebaseFirestore.getInstance() // Firestore instance
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
         Image(
@@ -47,22 +47,7 @@ fun SignUpScreen(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        IconButton(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-                .size(48.dp) // Tamaño del botón
-                .clip(RoundedCornerShape(12.dp)) // Bordes redondeados
-                .background(Color(0xFF4A5D80)) // Color de fondo
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack, // Icono de flecha
-                contentDescription = "Regresar",
-                tint = Color.White // Color del icono
-            )
-        }
-        // Columna principal
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,14 +84,10 @@ fun SignUpScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Campo de nombre (solo letras y espacios)
+                    // Campos de texto para los datos del usuario
                     OutlinedTextField(
                         value = nombre,
-                        onValueChange = { nuevoValor ->
-                            if (nuevoValor.all { it.isLetter() || it.isWhitespace() }) {
-                                nombre = nuevoValor
-                            }
-                        },
+                        onValueChange = { nombre = it },
                         label = { Text("Nombre") },
                         leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Nombre") },
                         modifier = Modifier.fillMaxWidth(),
@@ -115,14 +96,9 @@ fun SignUpScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Campo de apellido (solo letras y espacios)
                     OutlinedTextField(
                         value = apellido,
-                        onValueChange = { nuevoValor ->
-                            if (nuevoValor.all { it.isLetter() || it.isWhitespace() }) {
-                                apellido = nuevoValor
-                            }
-                        },
+                        onValueChange = { apellido = it },
                         label = { Text("Apellido") },
                         leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Apellido") },
                         modifier = Modifier.fillMaxWidth(),
@@ -131,15 +107,9 @@ fun SignUpScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Campo de correo electrónico (validación mínima de caracteres)
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { nuevoValor ->
-                            // Permitimos letras, dígitos, @, ., _, y -
-                            if (nuevoValor.matches(Regex("^[A-Za-z0-9@._-]*$"))) {
-                                email = nuevoValor
-                            }
-                        },
+                        onValueChange = { email = it },
                         label = { Text("Correo electrónico") },
                         leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Correo") },
                         modifier = Modifier.fillMaxWidth(),
@@ -149,14 +119,9 @@ fun SignUpScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Campo de teléfono (solo dígitos)
                     OutlinedTextField(
                         value = telefono,
-                        onValueChange = { nuevoValor ->
-                            if (nuevoValor.all { it.isDigit() }) {
-                                telefono = nuevoValor
-                            }
-                        },
+                        onValueChange = { telefono = it },
                         label = { Text("Teléfono") },
                         leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = "Teléfono") },
                         modifier = Modifier.fillMaxWidth(),
@@ -166,7 +131,6 @@ fun SignUpScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Campo de contraseña (oculta caracteres)
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -185,13 +149,43 @@ fun SignUpScreen(navController: NavController) {
                         onClick = {
                             errorMessage = ""
                             when {
-                                tipoCuenta.isBlank() || nombre.isBlank() || apellido.isBlank()
-                                        || email.isBlank() || telefono.isBlank() || password.isBlank() ->
+                                tipoCuenta.isBlank() || nombre.isBlank() || apellido.isBlank() ||
+                                        email.isBlank() || telefono.isBlank() || password.isBlank() ->
                                     errorMessage = "Por favor, completa todos los campos."
                                 else -> {
-                                    // Aquí podrías llamar a tu repositorio o ViewModel para registrar al usuario
-                                    navController.navigate(Screen.Success.route)
+                                    // Llamamos a Firebase Authentication para crear el usuario
+                                    auth.createUserWithEmailAndPassword(email, password)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                val firebaseUser: FirebaseUser? = auth.currentUser
+                                                val userId = firebaseUser?.uid
 
+                                                // Guardamos los datos del usuario en Firestore
+                                                val user = hashMapOf(
+                                                    "nombre" to nombre,
+                                                    "apellido" to apellido,
+                                                    "email" to email,
+                                                    "telefono" to telefono,
+                                                    "tipoCuenta" to tipoCuenta
+                                                )
+
+                                                if (userId != null) {
+                                                    firestore.collection("users")
+                                                        .document(userId)
+                                                        .set(user)
+                                                        .addOnSuccessListener {
+                                                            // Registro exitoso, navega a la pantalla de éxito
+                                                            navController.navigate(Screen.Success.route)
+                                                        }
+                                                        .addOnFailureListener { e ->
+                                                            // Manejo de error en Firestore
+                                                            errorMessage = "Error al guardar los datos: ${e.message}"
+                                                        }
+                                                }
+                                            } else {
+                                                errorMessage = "Error al crear la cuenta: ${task.exception?.message}"
+                                            }
+                                        }
                                 }
                             }
                         },
@@ -214,9 +208,6 @@ fun SignUpScreen(navController: NavController) {
     }
 }
 
-/**
- * Dropdown simple para seleccionar el tipo de cuenta (por ejemplo, "Usuario" o "Refugio").
- */
 @Composable
 fun TipoCuentaDropdown(
     tipoCuentaSeleccionado: String,
@@ -254,4 +245,3 @@ fun TipoCuentaDropdown(
         }
     }
 }
-

@@ -22,6 +22,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pawconnect.Screen
 import com.example.pawconnect.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseUser
+
 
 
 @Composable
@@ -32,6 +36,9 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
+    val auth = FirebaseAuth.getInstance() // FirebaseAuth instance
+    val firestore = FirebaseFirestore.getInstance() // Firestore instance
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
         Image(
@@ -41,7 +48,6 @@ fun LoginScreen(navController: NavController) {
             contentScale = ContentScale.Crop
         )
 
-        // Columna principal
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,7 +76,6 @@ fun LoginScreen(navController: NavController) {
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     TipoCuentaDropdown(
                         tipoCuentaSeleccionado = tipoCuenta,
                         onTipoCuentaChange = { tipoCuenta = it }
@@ -81,7 +86,6 @@ fun LoginScreen(navController: NavController) {
                     OutlinedTextField(
                         value = email,
                         onValueChange = { nuevoValor ->
-                            // Permitimos letras, dígitos, @, ., _ y -
                             if (nuevoValor.matches(Regex("^[A-Za-z0-9@._-]*$"))) {
                                 email = nuevoValor
                             }
@@ -95,7 +99,7 @@ fun LoginScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Campo de contraseña (oculta caracteres)
+                    // Campo de contraseña
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -114,17 +118,34 @@ fun LoginScreen(navController: NavController) {
                         onClick = {
                             errorMessage = ""
                             when {
-                                tipoCuenta == "Selecciona tipo de cuenta" ||
-                                        email.isBlank() || password.isBlank() ->
+                                tipoCuenta == "Selecciona tipo de cuenta" || email.isBlank() || password.isBlank() ->
                                     errorMessage = "Por favor, completa todos los campos."
                                 !isValidEmail(email) ->
                                     errorMessage = "El correo electrónico no es válido."
                                 else -> {
-                                    if (email == "refugio@gmail.com" && password == "123") {
-                                        navController.navigate(Screen.ShelterHome.route)
-                                    } else {
-                                        navController.navigate(Screen.UserHome.route)
-                                    }
+                                    // Intentamos iniciar sesión con Firebase Auth
+                                    auth.signInWithEmailAndPassword(email, password)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                val user = auth.currentUser
+                                                // Verificamos si el usuario existe en la base de datos
+                                                user?.let { firebaseUser ->
+                                                    firestore.collection("users")
+                                                        .document(firebaseUser.uid)
+                                                        .get()
+                                                        .addOnSuccessListener { document ->
+                                                            // Aquí se pueden manejar los datos del usuario
+                                                            val userName = document.getString("name") ?: "Usuario"
+                                                            navController.navigate(Screen.UserHome.route)
+                                                        }
+                                                        .addOnFailureListener {
+                                                            errorMessage = "Error al obtener datos del usuario."
+                                                        }
+                                                }
+                                            } else {
+                                                errorMessage = "Credenciales incorrectas"
+                                            }
+                                        }
                                 }
                             }
                         },
@@ -159,3 +180,4 @@ fun LoginScreen(navController: NavController) {
 fun isValidEmail(email: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
+
