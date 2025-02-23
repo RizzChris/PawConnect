@@ -1,20 +1,27 @@
 package com.example.pawconnect.ui.screens.shelter
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pawconnect.R
+import com.example.pawconnect.Screen
+import com.example.pawconnect.ui.screens.components.ShelterBottomNavBar
 import kotlinx.coroutines.delay
+
 
 @Composable
 fun ShelterHomeScreen(navController: NavController) {
@@ -24,28 +31,23 @@ fun ShelterHomeScreen(navController: NavController) {
         R.drawable.refugio_dogs_2,
         R.drawable.refugio_dogs_3
     )
-    // Índice actual de la imagen mostrada
     var currentImageIndex by remember { mutableStateOf(0) }
 
-    // Efecto para cambiar la imagen cada 5 segundos
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(5000) // Espera 5 segundos
-            currentImageIndex = (currentImageIndex + 1) % imageList.size
-        }
+    // Carrusel de imágenes
+    LaunchedEffect(key1 = currentImageIndex) {
+        delay(5000) // Espera 5 segundos
+        currentImageIndex = (currentImageIndex + 1) % imageList.size
     }
 
     Scaffold(
         bottomBar = {
-            // Barra de navegación inferior
-            BottomNavBar(
-                onHuellasClick = { /* Navegar o manejar acción de huellas */ },
-                onHomeClick = { /* Navegar o manejar acción de home */ },
-                onPerfilClick = { /* Navegar o manejar acción de perfil */ }
+            ShelterBottomNavBar(
+                onHuellasClick = { navController.navigate(Screen.ShelterPets.route) },
+                onHomeClick = { navController.navigate(Screen.ShelterHome.route) },
+                onPerfilClick = { navController.navigate(Screen.ShelterProfile.route) }
             )
         }
     ) { innerPadding ->
-        // Contenido principal
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,12 +61,18 @@ fun ShelterHomeScreen(navController: NavController) {
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Logo PawConnect (arriba de todo)
+                // Logo PawConnect que lleva de vuelta al LoginScreen
                 Image(
                     painter = painterResource(id = R.drawable.logo_pawconnectuniendocorazonescambiandovidas),
                     contentDescription = "Logo PawConnect",
                     modifier = Modifier
                         .size(300.dp)
+                        .clickable {
+                            // Navegar de vuelta al LoginScreen
+                            navController.navigate(Screen.ShelterHome.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true } // Remueve las pantallas previas
+                            }
+                        }
                 )
 
                 Spacer(modifier = Modifier.height(5.dp))
@@ -99,64 +107,11 @@ fun ShelterHomeScreen(navController: NavController) {
                     contentScale = ContentScale.Crop
                 )
 
-                // Espacio para empujar la barra inferior hacia abajo
+                // Empuja la barra inferior al final
                 Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
 }
 
-/**
- * Barra de navegación inferior con 3 íconos:
- * - Huellas
- * - Home
- * - Perfil
- */
 
-@Composable
-fun BottomNavBar(
-    onHuellasClick: () -> Unit,
-    onHomeClick: () -> Unit,
-    onPerfilClick: () -> Unit
-) {
-    NavigationBar {
-        // Ícono huellas
-        NavigationBarItem(
-            selected = false,
-            onClick = { onHuellasClick() },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_huella),
-                    contentDescription = "Huellas"
-                )
-            },
-            label = { Text("Huellas", fontSize = 10.sp) }
-        )
-
-        // Ícono home
-        NavigationBarItem(
-            selected = true, // Si esta pantalla es el "Home", márcalo como seleccionado
-            onClick = { onHomeClick() },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_home),
-                    contentDescription = "Home"
-                )
-            },
-            label = { Text("Home", fontSize = 10.sp) }
-        )
-
-        // Ícono perfil
-        NavigationBarItem(
-            selected = false,
-            onClick = { onPerfilClick() },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_user),
-                    contentDescription = "Perfil"
-                )
-            },
-            label = { Text("Perfil", fontSize = 10.sp) }
-        )
-    }
-}

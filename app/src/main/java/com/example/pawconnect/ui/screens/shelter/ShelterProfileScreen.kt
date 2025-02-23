@@ -1,4 +1,4 @@
-package com.example.pawconnect.ui.screens.user
+package com.example.pawconnect.ui.screens.shelter
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +14,7 @@ import com.example.pawconnect.Screen
 
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ShelterProfileScreen(navController: NavController) {
     Column(
         modifier = androidx.compose.ui.Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

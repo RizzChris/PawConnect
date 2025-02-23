@@ -1,4 +1,4 @@
-package com.example.pawconnect.ui.screens.shelter
+package com.example.pawconnect.ui.screens.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
-import com.example.pawconnect.ui.screens.components.BottomNavBar
+import com.example.pawconnect.ui.screens.components.UserBottomNavBar
 import kotlinx.coroutines.delay
 
 @Composable
@@ -39,7 +39,7 @@ fun UserHomeScreen(navController: NavController) {
     // Scaffold con bottomBar
     Scaffold(
         bottomBar = {
-            BottomNavBar(
+            UserBottomNavBar(
                 onHuellasClick = { navController.navigate(Screen.Pets.route) },
                 onHomeClick = { navController.navigate(Screen.Home.route) },
                 onPerfilClick = { navController.navigate(Screen.Profile.route) }
