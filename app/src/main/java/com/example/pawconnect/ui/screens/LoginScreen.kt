@@ -27,7 +27,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseUser
 
 
-
 @Composable
 fun LoginScreen(navController: NavController) {
     // Estados para cada campo
@@ -136,7 +135,14 @@ fun LoginScreen(navController: NavController) {
                                                         .addOnSuccessListener { document ->
                                                             // Aquí se pueden manejar los datos del usuario
                                                             val userName = document.getString("name") ?: "Usuario"
-                                                            navController.navigate(Screen.UserHome.route)
+                                                            // Verificar el tipo de cuenta
+                                                            if (tipoCuenta == "Refugio") {
+                                                                // Si el tipo de cuenta es Refugio, navega a ShelterHomeScreen
+                                                                navController.navigate(Screen.ShelterHome.route)
+                                                            } else {
+                                                                // Si el tipo de cuenta es Usuario, navega a UserHome
+                                                                navController.navigate(Screen.UserHome.route)
+                                                            }
                                                         }
                                                         .addOnFailureListener {
                                                             errorMessage = "Error al obtener datos del usuario."
@@ -180,4 +186,3 @@ fun LoginScreen(navController: NavController) {
 fun isValidEmail(email: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
-

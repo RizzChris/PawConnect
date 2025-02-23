@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.sp
 import com.example.pawconnect.R
 
 @Composable
-fun BottomNavBar(
+fun UserBottomNavBar(
     onHuellasClick: () -> Unit,
     onHomeClick: () -> Unit,
     onPerfilClick: () -> Unit

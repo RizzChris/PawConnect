@@ -21,6 +21,7 @@ import com.example.pawconnect.Screen
 
 @Composable
 fun SuccessScreen(navController: NavController) {
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo con blur
         Image(
