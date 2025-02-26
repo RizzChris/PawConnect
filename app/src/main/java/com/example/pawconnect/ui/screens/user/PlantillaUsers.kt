@@ -10,17 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
 import com.example.pawconnect.ui.screens.components.UserBottomNavBar
 import kotlinx.coroutines.delay
 
 @Composable
-fun UserHomeScreen(navController: NavController) {
+fun PlantillaUsers(navController: NavController) {
     // Lista de imágenes para el carrusel
     val imageList = listOf(
         R.drawable.refugio_dogs_1,
@@ -107,3 +105,9 @@ fun UserHomeScreen(navController: NavController) {
     }
 }
 
+//@Preview
+//@Composable
+//fun PlantillaUsersPreview() {
+//    val navController = rememberNavController()
+//    PlantillaUsers(navController = navController)
+//}

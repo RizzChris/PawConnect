@@ -17,6 +17,8 @@ import com.example.pawconnect.ui.screens.shelter.ShelterPruebas
 import com.example.pawconnect.ui.screens.shelter.ShelterRegistrationPetsScreen
 import com.example.pawconnect.ui.screens.user.UserHomeScreen
 import com.example.pawconnect.ui.screens.shelter.ShelterSuccess
+import com.example.pawconnect.ui.screens.shelter.PlantillaRefugio
+import com.example.pawconnect.ui.screens.user.PlantillaUsers
 
 
 // Definir las rutas de la app en una sola sealed class
@@ -27,19 +29,27 @@ sealed class Screen(val route: String) {
     object Success : Screen("success")
 
     //usuario
-    object Home : Screen("home")
-    object Main : Screen("main")
-    object Pets : Screen("pets")
-    object Profile : Screen("profile")
-    object UserHome : Screen("user_home")
+    data object Home : Screen("home")
+    data object Main : Screen("main")
+    data object Pets : Screen("pets")
+    data object Profile : Screen("profile")
+    data object UserHome : Screen("user_home")
+
     //refugio
-    object ShelterHome : Screen("shelter_home")
-    object ShelterProfile : Screen("shelter_profile")
-    object ShelterRegistrationPets : Screen("shelter_registration_pets")
-    object ShelterPets : Screen("shelter_pets")
-    object ShelterFormularioPets : Screen("shelter_formulario_pets")
-    object ShelterPruebas : Screen("shelter_pruebas")
-    object ShelterSuccess : Screen("shelter_success")
+    data object ShelterHome : Screen("shelter_home")
+    data object ShelterProfile : Screen("shelter_profile")
+    data object ShelterRegistrationPets : Screen("shelter_registration_pets")
+    data object ShelterPets : Screen("shelter_pets")
+    data object ShelterFormularioPets : Screen("shelter_formulario_pets")
+    data object ShelterPruebas : Screen("shelter_pruebas")
+    data object ShelterSuccess : Screen("shelter_success")
+
+
+
+
+    data object PlantillaRefugio : Screen("plantilla_refugio")
+    data object PlantillaUsers : Screen("plantilla_users")
+
 }
 
 // Función que maneja la navegación
@@ -67,6 +77,10 @@ fun AppNavigation(navController: NavHostController) {
 
 
         composable(Screen.ShelterPruebas.route) { ShelterPruebas(navController) }
+        composable(Screen.PlantillaRefugio.route) { PlantillaRefugio(navController) }
+        composable(Screen.PlantillaUsers.route) { PlantillaUsers(navController) }
+
+
     }
 }
 

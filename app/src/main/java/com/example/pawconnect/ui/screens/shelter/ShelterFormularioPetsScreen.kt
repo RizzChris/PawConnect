@@ -85,7 +85,6 @@ fun ShelterFormularioPetsScreen(navController: NavController) {
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
                 // Cuadro gris que contendrá el formulario con scroll
                 Box(
                     modifier = Modifier

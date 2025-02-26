@@ -29,9 +29,6 @@ import com.example.pawconnect.ui.screens.components.ShelterBottomNavBar
 import android.util.Patterns
 
 
-
-
-
 @Composable
 fun PetsScreen(navController: NavController) {
     // Estados para la lista de mascotas y la carga
@@ -56,9 +53,9 @@ fun PetsScreen(navController: NavController) {
         bottomBar = {
             // Barra de navegación inferior (NavBar)
             ShelterBottomNavBar(
-                onHuellasClick = { navController.navigate(Screen.ShelterPets.route) },
-                onHomeClick = { navController.navigate(Screen.ShelterHome.route) },
-                onPerfilClick = { navController.navigate(Screen.ShelterProfile.route) }
+                onHuellasClick = { navController.navigate(Screen.Pets.route) },
+                onHomeClick = { navController.navigate(Screen.Home.route) },
+                onPerfilClick = { navController.navigate(Screen.Profile.route) }
             )
         }
     ) { innerPadding ->
