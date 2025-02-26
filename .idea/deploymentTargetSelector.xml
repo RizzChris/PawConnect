@@ -22,6 +22,9 @@
       <SelectionState runConfigName="PreviewShelterPruebas">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="PlantillaRefugioPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

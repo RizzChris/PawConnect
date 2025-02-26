@@ -1,13 +1,18 @@
-package com.example.pawconnect.ui.screens.user
+package com.example.pawconnect.ui.screens.shelter
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,38 +21,35 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
-import com.example.pawconnect.ui.screens.components.UserBottomNavBar
+import com.example.pawconnect.ui.screens.components.ShelterBottomNavBar
 import kotlinx.coroutines.delay
 
+
 @Composable
-fun UserHomeScreen(navController: NavController) {
+fun PlantillaRefugio(navController: NavController) {
     // Lista de imágenes para el carrusel
     val imageList = listOf(
         R.drawable.refugio_dogs_1,
         R.drawable.refugio_dogs_2,
         R.drawable.refugio_dogs_3
     )
-    // Índice actual de la imagen mostrada
     var currentImageIndex by remember { mutableStateOf(0) }
 
-    // Efecto para cambiar la imagen cada 5 segundos
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(5000) // Espera 5 segundos
-            currentImageIndex = (currentImageIndex + 1) % imageList.size
-        }
+    // Carrusel de imágenes
+    LaunchedEffect(key1 = currentImageIndex) {
+        delay(5000) // Espera 5 segundos
+        currentImageIndex = (currentImageIndex + 1) % imageList.size
     }
-    // Scaffold con bottomBar
+
     Scaffold(
         bottomBar = {
-            UserBottomNavBar(
-                onHuellasClick = { navController.navigate(Screen.Pets.route) },
-                onHomeClick = { navController.navigate(Screen.Home.route) },
-                onPerfilClick = { navController.navigate(Screen.Profile.route) }
+            ShelterBottomNavBar(
+                onHuellasClick = { navController.navigate(Screen.ShelterPets.route) },
+                onHomeClick = { navController.navigate(Screen.ShelterHome.route) },
+                onPerfilClick = { navController.navigate(Screen.ShelterProfile.route) }
             )
         }
     ) { innerPadding ->
-        // Contenido principal
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -61,11 +63,18 @@ fun UserHomeScreen(navController: NavController) {
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Logo PawConnect
+                // Logo PawConnect que lleva de vuelta al LoginScreen
                 Image(
                     painter = painterResource(id = R.drawable.logo_pawconnectuniendocorazonescambiandovidas),
                     contentDescription = "Logo PawConnect",
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier
+                        .size(300.dp)
+                        .clickable {
+                            // Navegar de vuelta al LoginScreen
+                            navController.navigate(Screen.ShelterHome.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true } // Remueve las pantallas previas
+                            }
+                        }
                 )
 
                 Spacer(modifier = Modifier.height(5.dp))
@@ -106,4 +115,5 @@ fun UserHomeScreen(navController: NavController) {
         }
     }
 }
+
 
