@@ -3,107 +3,110 @@ package com.example.pawconnect.ui.screens.user
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.pawconnect.R
 import com.example.pawconnect.Screen
 import com.example.pawconnect.ui.screens.components.UserBottomNavBar
-import kotlinx.coroutines.delay
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
+
 
 @Composable
 fun UserHomeScreen(navController: NavController) {
-    // Lista de imágenes para el carrusel
-    val imageList = listOf(
-        R.drawable.refugio_dogs_1,
-        R.drawable.refugio_dogs_2,
-        R.drawable.refugio_dogs_3
-    )
-    // Índice actual de la imagen mostrada
-    var currentImageIndex by remember { mutableStateOf(0) }
-
-    // Efecto para cambiar la imagen cada 5 segundos
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(5000) // Espera 5 segundos
-            currentImageIndex = (currentImageIndex + 1) % imageList.size
-        }
-    }
-    // Scaffold con bottomBar
     Scaffold(
         bottomBar = {
+            // Barra de navegación inferior (NavBar)
             UserBottomNavBar(
                 onHuellasClick = { navController.navigate(Screen.Pets.route) },
                 onHomeClick = { navController.navigate(Screen.Home.route) },
                 onPerfilClick = { navController.navigate(Screen.Profile.route) }
             )
         }
-    ) { innerPadding ->
-        // Contenido principal
-        Box(
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .background(Color.White)
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Image(
+                painter = painterResource(id = com.example.pawconnect.R.drawable.logo_pawconnectuniendocorazonescambiandovidas),
+                contentDescription = "Logo PawConnect",
+                modifier = Modifier.height(50.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Image(
+                painter = painterResource(id = com.example.pawconnect.R.drawable.refugio_dogs_2),
+                contentDescription = "Imagen Destacada",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth(0.9f)
+                    .clip(MaterialTheme.shapes.medium)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Logo PawConnect
-                Image(
-                    painter = painterResource(id = R.drawable.logo_pawconnectuniendocorazonescambiandovidas),
-                    contentDescription = "Logo PawConnect",
-                    modifier = Modifier.size(300.dp)
+                CategoryButton(
+                    iconRes = painterResource(id = com.example.pawconnect.R.drawable.icon_dog),
+                    label = "Perros",
+                    onClick = {  navController.navigate(Screen.UserDogs.route) }
                 )
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                // Carrusel de imágenes
-                Image(
-                    painter = painterResource(id = imageList[currentImageIndex]),
-                    contentDescription = "Carrusel Refugio",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
+                CategoryButton(
+                    iconRes = painterResource(id = com.example.pawconnect.R.drawable.icon_cat),
+                    label = "Gatos",
+                    onClick = { navController.navigate(Screen.UserCats.route) }
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Mensaje de bienvenida
-                Text(
-                    text = "Bienvenid@: Patitas de amor",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Logo Patitas de amor
-                Image(
-                    painter = painterResource(id = R.drawable.logopatitasdeamor),
-                    contentDescription = "Logo Patitas de amor",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-
-                // Empuja la barra inferior al final
-                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
 }
+
+@Composable
+fun CategoryButton(iconRes: Painter, label: String, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = iconRes,
+                contentDescription = label,
+                modifier = Modifier.size(40.dp),
+                tint = Color.Black
+            )
+        }
+        Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
 

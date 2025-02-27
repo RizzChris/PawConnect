@@ -321,15 +321,15 @@ fun ShelterFormularioPetsScreen(navController: NavController) {
                                             errorMessage = "La especie debe ser 'perro' o 'gato'."
                                         petBreed.isBlank() || !petBreed.all { it.isLetter() || it.isWhitespace() } ->
                                             errorMessage = "La raza debe contener solo letras y espacios."
-                                        petSize.isBlank() ||
-                                                (petSize.lowercase() != "chico" && petSize.lowercase() != "mediano" && petSize.lowercase() != "grande") ->
+                                        petSize.isBlank() || !petSize.all { it.isLetter() || it.isWhitespace() } ->
+                                                //(petSize.lowercase() != "chico" && petSize.lowercase() != "mediano" && petSize.lowercase() != "grande") ->
                                             errorMessage = "El tamaño debe ser 'chico', 'mediano' o 'grande'."
                                         petWeight.isBlank() || petWeight.toDoubleOrNull() == null ->
                                             errorMessage = "El peso debe ser un número."
                                         petAge.isBlank() || petAge.toIntOrNull() == null ->
                                             errorMessage = "La edad debe ser un número entero."
-                                        petSex.isBlank() ||
-                                                (petSex.lowercase() != "macho" && petSex.lowercase() != "hembra") ->
+                                        petSex.isBlank() || !petSex.all { it.isLetter() || it.isWhitespace() } ->
+                                                //(petSex.lowercase() != "macho" && petSex.lowercase() != "hembra") ->
                                             errorMessage = "El sexo debe ser 'macho' o 'hembra'."
                                         petPhoto.isBlank() ->
                                             errorMessage = "Debe proporcionar una URL para la foto."
@@ -358,7 +358,7 @@ fun ShelterFormularioPetsScreen(navController: NavController) {
                                                 getAlongKids = getAlongKids
                                             ) { success, error ->
                                                 if (success) {
-                                                    // Por ejemplo, navega a una pantalla de éxito
+                                                    // navega a una pantalla de éxito
                                                     navController.navigate(Screen.ShelterSuccess.route)
                                                 } else {
                                                     errorMessage = error ?: "Error al registrar la mascota"

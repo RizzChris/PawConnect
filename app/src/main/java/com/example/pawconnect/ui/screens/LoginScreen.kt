@@ -105,7 +105,7 @@ fun LoginScreen(navController: NavController) {
                         label = { Text("Contraseña") },
                         leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Contraseña") },
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+                       keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                         visualTransformation = PasswordVisualTransformation(),
                         shape = RoundedCornerShape(12.dp)
                     )
