@@ -3,9 +3,9 @@ package com.example.pawconnect.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-
-// Modelo de datos (opcional, para estructurar la información de la mascota)
-data class Pet(
+// Modelo de datos unificado con todos los campos necesarios
+data class PetData(
+    val id: String = "",
     val petName: String = "",
     val petSpecies: String = "",
     val petBreed: String = "",
@@ -20,28 +20,12 @@ data class Pet(
     val personality: String = "",
     val medicalCondition: String = "",
     val getAlongOtherAnimals: String = "",
-    val getAlongKids: String = ""
+    val getAlongKids: String = "",
+    val refugioId: String = ""  // Identifica al refugio que registró la mascota
 )
 
 /**
- * Función para registrar una mascota en Firestore.
- *
- * @param petName Nombre de la mascota.
- * @param petSpecies Especie de la mascota (Perro o gato).
- * @param petBreed Raza de la mascota.
- * @param petSize Tamaño de la mascota.
- * @param petWeight Peso de la mascota.
- * @param petAge Edad aproximada.
- * @param petSex Sexo de la mascota.
- * @param petPhoto URL o referencia a la fotografía de la mascota.
- * @param petHistory Historia de la mascota.
- * @param isSterilized Indica si está esterilizada.
- * @param hasVaccines Indica si tiene vacunas al día.
- * @param personality Descripción de su personalidad.
- * @param medicalCondition Información sobre condiciones médicas o necesidades especiales.
- * @param getAlongOtherAnimals ¿Se lleva bien con otros animales?
- * @param getAlongKids ¿Se lleva bien con niños?
- * @param onComplete Callback que retorna (Boolean, String?) indicando éxito y, en caso de error, el mensaje.
+ * Función para registrar una mascota en Firestore usando una colección global "mascotas".
  */
 fun registerPet(
     petName: String,
@@ -61,14 +45,14 @@ fun registerPet(
     getAlongKids: String,
     onComplete: (Boolean, String?) -> Unit
 ) {
-    // Obtiene el UID del usuario autenticado (refugio)
+    // Obtiene el UID del refugio autenticado
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     if (userId == null) {
         onComplete(false, "Usuario no autenticado")
         return
     }
 
-    // Crea un mapa con los datos de la mascota
+    // Crea el mapa de datos
     val petData = hashMapOf(
         "petName" to petName,
         "petSpecies" to petSpecies,
@@ -84,20 +68,58 @@ fun registerPet(
         "personality" to personality,
         "medicalCondition" to medicalCondition,
         "getAlongOtherAnimals" to getAlongOtherAnimals,
-        "getAlongKids" to getAlongKids
+        "getAlongKids" to getAlongKids,
+        "refugioId" to userId
     )
 
-    // Guarda los datos en Firestore
+    // Guarda en la colección global "mascotas"
     FirebaseFirestore.getInstance()
-        .collection("users")
-        .document(userId)
         .collection("mascotas")
         .add(petData)
-        .addOnSuccessListener {
-            onComplete(true, null)
+        .addOnSuccessListener { onComplete(true, null) }
+        .addOnFailureListener { e -> onComplete(false, e.message) }
+}
+
+/**
+ * Recupera todas las mascotas de la colección global "mascotas".
+ */
+fun fetchAllPets(onComplete: (Boolean, List<PetData>, String?) -> Unit) {
+    FirebaseFirestore.getInstance()
+        .collection("mascotas")
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+            val pets = querySnapshot.documents.mapNotNull { doc ->
+                doc.toObject(PetData::class.java)?.copy(id = doc.id)
+            }
+            onComplete(true, pets, null)
         }
         .addOnFailureListener { e ->
-            onComplete(false, e.message)
+            onComplete(false, emptyList(), e.localizedMessage)
         }
 }
+
+/**
+ * Recupera mascotas filtradas por especie desde la colección global "mascotas".
+ * Ej.: species = "perro" o "gato"
+ */
+fun fetchPetsBySpecies(
+    species: String,
+    onComplete: (Boolean, List<PetData>, String?) -> Unit
+){
+    FirebaseFirestore.getInstance()
+        .collection("mascotas")
+        .whereEqualTo("petSpecies", species)
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+            val pets = querySnapshot.documents.mapNotNull { doc ->
+                doc.toObject(PetData::class.java)?.copy(id = doc.id)
+            }
+            onComplete(true, pets, null)
+        }
+        .addOnFailureListener { e ->
+            onComplete(false, emptyList(), e.localizedMessage)
+        }
+}
+
+
 
