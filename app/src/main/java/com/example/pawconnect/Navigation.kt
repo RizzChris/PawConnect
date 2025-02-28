@@ -17,7 +17,7 @@ import com.example.pawconnect.ui.screens.shelter.ShelterFormularioPetsScreen
 import com.example.pawconnect.ui.screens.shelter.ShelterSuccess
 import com.example.pawconnect.ui.screens.shelter.ShelterPruebas
 import com.example.pawconnect.ui.screens.shelter.PlantillaRefugio
-import com.example.pawconnect.ui.screens.user.PetsScreen
+import com.example.pawconnect.ui.screens.user.SolitudesUserScreen
 import com.example.pawconnect.ui.screens.user.ProfileScreen
 import com.example.pawconnect.ui.screens.user.UserHomeScreen
 import com.example.pawconnect.ui.screens.user.UserDogsScreen
@@ -64,7 +64,7 @@ fun AppNavigation(navController: NavHostController) {
 
         // Usuario
         composable(Screen.Home.route) { UserHomeScreen(navController) }
-        composable(Screen.Pets.route) { PetsScreen(navController) }
+        composable(Screen.Pets.route) { SolitudesUserScreen(navController) }
         composable(Screen.Profile.route) { ProfileScreen(navController) }
         composable(Screen.UserHome.route) { UserHomeScreen(navController) }
         composable(Screen.UserDogs.route) { UserDogsScreen(navController) }
@@ -90,7 +90,3 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.PlantillaUsers.route) { PlantillaUsers(navController) }
     }
 }
-
-
-
-

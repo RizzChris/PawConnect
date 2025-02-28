@@ -3,20 +3,12 @@ package com.example.pawconnect.ui.screens.user
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.Button
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -56,12 +48,25 @@ fun PetDetailScreen(navController: NavController, petId: String) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = pet?.petName ?: "Detalle de la Mascota") },
+                title = {
+                    Text(text = pet?.petName ?: "Detalle de la Mascota",
+                        color = MaterialTheme.colorScheme.onPrimary)
+                        },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.icon_huella),
-                            contentDescription = "Regresar"
+                            contentDescription = "Regresar",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* Agregar a favoritos */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_favorite),
+                            contentDescription = "Favorito",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
@@ -71,13 +76,14 @@ fun PetDetailScreen(navController: NavController, petId: String) {
             )
         }
     ) { innerPadding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
+        ) {
             when {
-                loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
+                loading -> CircularProgressIndicator()
                 errorMessage.isNotEmpty() -> {
                     Text(
                         text = errorMessage,
@@ -90,9 +96,9 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        // Imagen de la mascota
                         val painter = rememberAsyncImagePainter(
                             model = pet!!.petPhoto,
                             fallback = painterResource(R.drawable.my_placeholder),
@@ -107,16 +113,66 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                                 .clip(RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
+
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Especie: ${pet!!.petSpecies}", fontSize = 18.sp)
-                        Text("Raza: ${pet!!.petBreed}", fontSize = 18.sp)
-                        Text("Tamaño: ${pet!!.petSize}", fontSize = 18.sp)
-                        Text("Peso: ${pet!!.petWeight}", fontSize = 18.sp)
-                        Text("Edad: ${pet!!.petAge}", fontSize = 18.sp)
-                        Text("Sexo: ${pet!!.petSex}", fontSize = 18.sp)
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            // Chip(text = pet!!.petColor, iconRes = R.drawable.icon_color)
+                            Chip(text = pet!!.petBreed, iconRes = R.drawable.icon_dog)
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Chip(text = "${pet!!.petAge} años", iconRes = R.drawable.icon_age)
+                            Chip(text = pet!!.petSex, iconRes = R.drawable.icon_gender)
+                            Chip(text = "${pet!!.petWeight} kg", iconRes = R.drawable.icon_weight)
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Chip(text = pet!!.petSize, iconRes = R.drawable.icon_size)
+                            Chip(text = "Sí", iconRes = R.drawable.icon_vaccine)
+                            Chip(text = "Sí", iconRes = R.drawable.icon_sterilized)
+                        }
+
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { /* Lógica para agregar a favoritos */ }) {
-                            Text("Agregar a favoritos")
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED))
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "Historia:",
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = pet!!.petHistory,
+                                    fontSize = 14.sp,
+                                    color = Color.DarkGray,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = { /* Acción para adoptar */ },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            Text("Adóptame", fontSize = 18.sp)
                         }
                     }
                 }
@@ -125,4 +181,28 @@ fun PetDetailScreen(navController: NavController, petId: String) {
     }
 }
 
+@Composable
+fun Chip(text: String, iconRes: Int) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = Color(0xFFFFD966), // Amarillo
+        modifier = Modifier.padding(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = text,
+                tint = Color.Black,
+                modifier = Modifier.size(18.dp)
+            )
 
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(text = text, fontSize = 14.sp)
+        }
+    }
+}

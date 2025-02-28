@@ -83,4 +83,3 @@ fun UserCatsScreen(navController: NavController) {
         }
     }
 }
-
