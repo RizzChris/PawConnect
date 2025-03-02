@@ -17,13 +17,14 @@ import com.example.pawconnect.ui.screens.shelter.ShelterFormularioPetsScreen
 import com.example.pawconnect.ui.screens.shelter.ShelterSuccess
 import com.example.pawconnect.ui.screens.shelter.ShelterPruebas
 import com.example.pawconnect.ui.screens.shelter.PlantillaRefugio
-import com.example.pawconnect.ui.screens.user.PetsScreen
+import com.example.pawconnect.ui.screens.user.SolitudesUserScreen
 import com.example.pawconnect.ui.screens.user.ProfileScreen
 import com.example.pawconnect.ui.screens.user.UserHomeScreen
 import com.example.pawconnect.ui.screens.user.UserDogsScreen
 import com.example.pawconnect.ui.screens.user.UserCatsScreen
 import com.example.pawconnect.ui.screens.user.PetDetailScreen
 import com.example.pawconnect.ui.screens.user.PlantillaUsers
+import com.example.pawconnect.ui.screens.user.FavoritesScreen
 
 sealed class Screen(val route: String) {
     // Autenticación
@@ -40,6 +41,7 @@ sealed class Screen(val route: String) {
     object UserCats : Screen("user_cats")
     object UserRegistrationPets : Screen("user_registration_pets")
     object PetDetails : Screen("pet_details/{petId}")
+    object Favorites : Screen("favorites")
 
     // Refugio
     object ShelterHome : Screen("shelter_home")
@@ -64,7 +66,7 @@ fun AppNavigation(navController: NavHostController) {
 
         // Usuario
         composable(Screen.Home.route) { UserHomeScreen(navController) }
-        composable(Screen.Pets.route) { PetsScreen(navController) }
+        composable(Screen.Pets.route) { SolitudesUserScreen(navController) }
         composable(Screen.Profile.route) { ProfileScreen(navController) }
         composable(Screen.UserHome.route) { UserHomeScreen(navController) }
         composable(Screen.UserDogs.route) { UserDogsScreen(navController) }
@@ -77,6 +79,7 @@ fun AppNavigation(navController: NavHostController) {
             val petId = backStackEntry.arguments?.getString("petId") ?: ""
             PetDetailScreen(navController, petId)
         }
+        composable(Screen.Favorites.route) { FavoritesScreen(navController) }
 
         // Refugio
         composable(Screen.ShelterHome.route) { ShelterHomeScreen(navController) }
@@ -90,7 +93,6 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.PlantillaUsers.route) { PlantillaUsers(navController) }
     }
 }
-
 
 
 
