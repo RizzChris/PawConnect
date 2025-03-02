@@ -56,7 +56,7 @@ fun ShelterProfileScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
 
-        ) {
+            ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -102,7 +102,7 @@ fun ShelterProfileScreen(navController: NavController) {
             onClick = { /* Navigate to adoption guide */ },
             modifier = Modifier.fillMaxWidth(0.8f)
         ) {
-            Text(text = "Guía de adopción")
+            Text(text = "Guía de adopción")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -111,7 +111,7 @@ fun ShelterProfileScreen(navController: NavController) {
             onClick = { navController.navigate(Screen.Login.route) },
             modifier = Modifier.fillMaxWidth(0.8f)
         ) {
-            Text(text = "Cerrar sesión")
+            Text(text = "Cerrar sesión")
         }
     }
 }
