@@ -4,7 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,11 +17,18 @@ import androidx.navigation.NavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
 import com.example.pawconnect.ui.screens.components.UserBottomNavBar
-import com.example.pawconnect.ui.screens.user.FavoritesScreen
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
+    // Obtén el usuario actual de Firebase Auth
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    // Si el displayName no está establecido, usa un valor por defecto
+    val userName = currentUser?.displayName ?: "Usuario Ejemplo"
+    // Obtén el email o usa un valor por defecto
+    val userEmail = currentUser?.email ?: "usuario@email.com"
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -58,7 +66,6 @@ fun ProfileScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
-
                 // Imagen de usuario
                 Image(
                     painter = painterResource(id = R.drawable.icon_user),
@@ -67,28 +74,32 @@ fun ProfileScreen(navController: NavController) {
                         .size(100.dp)
                         .clip(CircleShape)
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Nombre y correo (estos valores pueden obtenerse de Firebase)
+                // Mostrar el nombre y correo del usuario obtenidos desde Firebase
                 Text(
-                    text = "Usuario Ejemplo",
+                    text = userName,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+                // Opcional: Si se muestra el valor por defecto, invita a actualizar el nombre
+                if (userName == "Usuario Ejemplo") {
+                    Text(
+                        text = "Actualiza tu nombre para personalizar tu perfil",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
                 Text(
-                    text = "usuario@email.com",
+                    text = userEmail,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
                 Spacer(modifier = Modifier.height(24.dp))
-
                 // Botones de opciones
-                ProfileButton(text = "Editar perfil") { /* Acción de edición */ }
+                ProfileButton(text = "Editar perfil") { navController.navigate(Screen.EditProfileScreen.route)}
                 ProfileButton(text = "Notificaciones") { /* Acción de notificaciones */ }
-                ProfileButton(text = "Mis favoritos") { navController.navigate(Screen.Favorites.route) }
-                ProfileButton(text = "Guía de adopción") { /* Acción de guía */ }
+                ProfileButton(text = "Mis favoritos") { navController.navigate(Screen.Favorite.route) }
+                ProfileButton(text = "Guía de adopción") { navController.navigate(Screen.GuiaDeAdopcion.route) }
                 ProfileButton(text = "Cerrar sesión") { navController.navigate(Screen.Login.route) }
             }
         }
@@ -107,3 +118,4 @@ fun ProfileButton(text: String, onClick: () -> Unit) {
         Text(text, fontSize = 16.sp)
     }
 }
+

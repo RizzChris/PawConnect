@@ -17,6 +17,8 @@ import com.example.pawconnect.ui.screens.shelter.ShelterFormularioPetsScreen
 import com.example.pawconnect.ui.screens.shelter.ShelterSuccess
 import com.example.pawconnect.ui.screens.shelter.ShelterPruebas
 import com.example.pawconnect.ui.screens.shelter.PlantillaRefugio
+import com.example.pawconnect.ui.screens.user.EditProfile
+import com.example.pawconnect.ui.screens.user.FavoriteScreen
 import com.example.pawconnect.ui.screens.user.SolitudesUserScreen
 import com.example.pawconnect.ui.screens.user.ProfileScreen
 import com.example.pawconnect.ui.screens.user.UserHomeScreen
@@ -24,6 +26,8 @@ import com.example.pawconnect.ui.screens.user.UserDogsScreen
 import com.example.pawconnect.ui.screens.user.UserCatsScreen
 import com.example.pawconnect.ui.screens.user.PetDetailScreen
 import com.example.pawconnect.ui.screens.user.PlantillaUsers
+import com.example.pawconnect.ui.screens.user.FormularioAdoptame
+import com.example.pawconnect.ui.screens.user.GuiaDeAdopcion
 
 sealed class Screen(val route: String) {
     // Autenticación
@@ -40,6 +44,10 @@ sealed class Screen(val route: String) {
     object UserCats : Screen("user_cats")
     object UserRegistrationPets : Screen("user_registration_pets")
     object PetDetails : Screen("pet_details/{petId}")
+    object Favorite : Screen("favorite")
+    object FormularioAdoptame : Screen("formulario_adoptame")
+    object GuiaDeAdopcion: Screen("guia_de_adopcion")
+    object EditProfileScreen: Screen("editar_perfil")
 
     // Refugio
     object ShelterHome : Screen("shelter_home")
@@ -49,6 +57,7 @@ sealed class Screen(val route: String) {
     object ShelterFormularioPets : Screen("shelter_formulario_pets")
     object ShelterSuccess : Screen("shelter_success")
     object ShelterPruebas : Screen("shelter_pruebas")
+
 
     // Otros
     object PlantillaRefugio : Screen("plantilla_refugio")
@@ -77,6 +86,11 @@ fun AppNavigation(navController: NavHostController) {
             val petId = backStackEntry.arguments?.getString("petId") ?: ""
             PetDetailScreen(navController, petId)
         }
+        composable(Screen.Favorite.route) { FavoriteScreen(navController) }
+        composable(Screen.FormularioAdoptame.route) { FormularioAdoptame(navController) }
+        composable(Screen.GuiaDeAdopcion.route) { GuiaDeAdopcion(navController) }
+        composable(Screen.EditProfileScreen.route) { EditProfile(navController) }
+
 
         // Refugio
         composable(Screen.ShelterHome.route) { ShelterHomeScreen(navController) }
@@ -90,3 +104,6 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.PlantillaUsers.route) { PlantillaUsers(navController) }
     }
 }
+
+
+
