@@ -1,12 +1,13 @@
 package com.example.pawconnect.ui.screens.user
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,8 +20,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.pawconnect.R
+import com.example.pawconnect.Screen
 import com.example.pawconnect.repository.PetData
+import com.example.pawconnect.repository.FavoritesRepository
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +32,12 @@ fun PetDetailScreen(navController: NavController, petId: String) {
     var pet by remember { mutableStateOf<PetData?>(null) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
+    // Estado para determinar si la mascota ya está en favoritos
+    var isFavorite by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
+    // Cargar los datos de la mascota desde la colección "mascotas"
     LaunchedEffect(petId) {
         FirebaseFirestore.getInstance()
             .collection("mascotas")
@@ -46,6 +55,15 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                 errorMessage = e.localizedMessage ?: "Error desconocido"
                 loading = false
             }
+    }
+
+    // Verificar si la mascota ya está en favoritos una vez que se haya cargado
+    LaunchedEffect(pet) {
+        pet?.let {
+            FavoritesRepository.isFavorite(it.id) { favorite ->
+                isFavorite = favorite
+            }
+        }
     }
 
     Scaffold(
@@ -66,16 +84,16 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+                colors = centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .padding(16.dp)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             when {
@@ -95,30 +113,26 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                 }
                 pet != null -> {
                     LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
                             val painter = rememberAsyncImagePainter(
-                                model = pet!!.petPhoto,
+                                model = pet?.petPhoto,
                                 fallback = painterResource(R.drawable.my_placeholder),
                                 error = painterResource(R.drawable.my_placeholder)
                             )
-
                             // Imagen de la mascota
                             Image(
                                 painter = painter,
-                                contentDescription = pet!!.petName,
+                                contentDescription = pet?.petName,
                                 modifier = Modifier
-                                    .size(220.dp)
+                                    .fillMaxWidth()
+                                    .height(200.dp)
                                     .clip(RoundedCornerShape(16.dp)),
                                 contentScale = ContentScale.Crop
                             )
-
                             Spacer(modifier = Modifier.height(16.dp))
-
                             // Tarjeta con detalles de la mascota
                             Card(
                                 modifier = Modifier
@@ -138,16 +152,13 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                                     PetDetailItem("Peso", "${pet!!.petWeight} kg")
                                     PetDetailItem("Edad", "${pet!!.petAge} años")
                                     PetDetailItem("Sexo", pet!!.petSex)
-
-                                    // Vacunación y Esterilización
+                                    Spacer(modifier = Modifier.height(8.dp))
                                     PetStatusItem("Vacunado", pet!!.hasVaccines)
                                     PetStatusItem("Esterilizado", pet!!.isSterilized)
                                 }
                             }
-
                             Spacer(modifier = Modifier.height(16.dp))
-
-                            // Historia de la mascota
+                            // Tarjeta con la historia de la mascota
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -156,9 +167,7 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp)
-                                ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
                                     Text(
                                         text = "Historia de ${pet!!.petName}",
                                         fontWeight = FontWeight.Bold,
@@ -167,27 +176,66 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = pet!!.petHistory ?: "No hay información disponible",
+                                        text = pet!!.petHistory.ifEmpty { "No hay información disponible" },
                                         fontSize = 16.sp,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
-
                             Spacer(modifier = Modifier.height(16.dp))
-
-                            // Botón de "Agregar a favoritos"
-                            Button(
-                                onClick = { /* Lógica para agregar a favoritos */ },
-                                modifier = Modifier.fillMaxWidth(0.8f),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text("Agregar a favoritos", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary)
+                            // Botón para agregar o eliminar favorito según el estado
+                            if (!isFavorite) {
+                                Button(
+                                    onClick = {
+                                        FavoritesRepository.addFavorite(petId = pet!!.id) { success, error ->
+                                            coroutineScope.launch {
+                                                if (success) {
+                                                    snackbarHostState.showSnackbar("Mascota agregada a favoritos")
+                                                    isFavorite = true
+                                                    navController.navigate(Screen.Favorite.route)  // Navega a Favoritos
+                                                } else {
+                                                    snackbarHostState.showSnackbar("Error al agregar: ${error ?: "Error desconocido"}")
+                                                }
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(0.8f),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text("Agregar a favoritos", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary)
+                                }
+                            } else {
+                                Button(
+                                    onClick = {
+                                        FavoritesRepository.removeFavorite(petId = pet!!.id) { success, error ->
+                                            coroutineScope.launch {
+                                                if (success) {
+                                                    snackbarHostState.showSnackbar("Mascota eliminada de favoritos")
+                                                    isFavorite = false
+                                                    navController.navigate(Screen.Favorite.route)  // Navega a Favoritos
+                                                } else {
+                                                    snackbarHostState.showSnackbar("Error al eliminar: ${error ?: "Error desconocido"}")
+                                                }
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(0.8f),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text("Eliminar de favoritos", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary)
+                                }
                             }
-
+                            Spacer(modifier = Modifier.height(8.dp))
+                            // Botón "Adóptame" (opcional)
                             Button(
-                                onClick = { /* Lógica para adoptar */ },
+                                onClick = {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("¡Adóptame exitoso!")
+                                        navController.navigate(Screen.Favorite.route)
+                                    }
+                                },
                                 modifier = Modifier.fillMaxWidth(0.8f),
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                 shape = RoundedCornerShape(12.dp)
@@ -210,8 +258,17 @@ fun PetDetailItem(label: String, value: String) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "$label:", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground)
-        Text(text = value, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground)
+        Text(
+            text = "$label:",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = value,
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 
@@ -230,7 +287,6 @@ fun PetStatusItem(label: String, status: Boolean) {
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onBackground
         )
-
         Icon(
             painter = painterResource(id = if (status) R.drawable.icon_check else R.drawable.icon_close),
             contentDescription = "$label status",
@@ -239,3 +295,4 @@ fun PetStatusItem(label: String, status: Boolean) {
         )
     }
 }
+
