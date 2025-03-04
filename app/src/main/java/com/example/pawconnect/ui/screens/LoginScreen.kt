@@ -157,7 +157,10 @@ fun LoginScreen(navController: NavController) {
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary, // Color dinámico
+                            contentColor = MaterialTheme.colorScheme.onPrimary // Color del texto dinámico
+                        )
                     ) {
                         Text("Iniciar Sesión", fontSize = 16.sp)
                     }
@@ -167,7 +170,7 @@ fun LoginScreen(navController: NavController) {
                     // Link de registro
                     Text(
                         text = "¿No tienes una cuenta? -> Regístrate aquí",
-                        color = Color.Blue,
+                        color = MaterialTheme.colorScheme.tertiary, // Color adaptativo
                         modifier = Modifier
                             .clickable { navController.navigate(Screen.Register.route) }
                             .padding(8.dp)

@@ -190,7 +190,10 @@ fun SignUpScreen(navController: NavController) {
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary, // Color dinámico
+                            contentColor = MaterialTheme.colorScheme.onPrimary // Color del texto dinámico
+                        )
                     ) {
                         Text("Crear mi cuenta", fontSize = 16.sp)
                     }

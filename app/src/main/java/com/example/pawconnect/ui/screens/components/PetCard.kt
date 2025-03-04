@@ -1,5 +1,7 @@
 package com.example.pawconnect.ui.screens.components
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +29,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.pawconnect.R
 import com.example.pawconnect.repository.PetData
 
+
 @Composable
 fun PetCard(pet: PetData, onClickInfo: () -> Unit) {
     Card(
@@ -51,7 +54,10 @@ fun PetCard(pet: PetData, onClickInfo: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = pet.petName, style = MaterialTheme.typography.titleMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                 if (pet.petSex.isNotBlank()) {
                     Chip(text = pet.petSex.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
                 }
@@ -73,13 +79,19 @@ fun Chip(text: String) {
         shape = RoundedCornerShape(50),
         color = Color(0xFFFFD966),
         modifier = Modifier
-            .height(28.dp)
             .wrapContentWidth()
+            .height(28.dp)
     ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.bodySmall
-        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = 8.dp),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }

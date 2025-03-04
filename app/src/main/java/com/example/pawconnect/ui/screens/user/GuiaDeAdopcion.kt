@@ -2,25 +2,21 @@ package com.example.pawconnect.ui.screens.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
 import com.example.pawconnect.ui.screens.components.UserBottomNavBar
 import kotlinx.coroutines.delay
 
 @Composable
-fun PlantillaUsers(navController: NavController) {
+fun GuiaDeAdopcion(navController: NavController) {
     // Lista de imágenes para el carrusel
     val imageList = listOf(
         R.drawable.refugio_dogs_1,
@@ -79,39 +75,10 @@ fun PlantillaUsers(navController: NavController) {
                         .height(200.dp),
                     contentScale = ContentScale.Crop
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Mensaje de bienvenida
-                Text(
-                    text = "Bienvenid@: Patitas de amor",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Logo Patitas de amor
-                Image(
-                    painter = painterResource(id = R.drawable.logopatitasdeamor),
-                    contentDescription = "Logo Patitas de amor",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-
                 // Empuja la barra inferior al final
                 Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
 }
-
-@Preview
-@Composable
-fun PlantillaUsersPreview() {
-    val navController = rememberNavController()
-    PlantillaUsers(navController = navController)
-}
-
 

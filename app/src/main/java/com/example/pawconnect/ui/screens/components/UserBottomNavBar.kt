@@ -17,7 +17,7 @@ fun UserBottomNavBar(
             selected = false,
             onClick = { onHuellasClick() },
             icon = { Icon(painter = painterResource(id = R.drawable.icon_huella), contentDescription = "Huellas") },
-            label = { Text("Mascotas", fontSize = 10.sp) }
+            label = { Text("Solicitudes", fontSize = 10.sp) }
         )
         NavigationBarItem(
             selected = false, // Marca como seleccionado si se está en MainScreen
