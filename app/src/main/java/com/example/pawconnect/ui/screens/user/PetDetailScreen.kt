@@ -231,9 +231,8 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                             // Botón "Adóptame" (opcional)
                             Button(
                                 onClick = {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("¡Adóptame exitoso!")
-                                        navController.navigate(Screen.Favorite.route)
+                                    pet?.let { safePet ->
+                                        navController.navigate("FormularioAdoptame/${safePet.id}")
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(0.8f),
@@ -242,6 +241,7 @@ fun PetDetailScreen(navController: NavController, petId: String) {
                             ) {
                                 Text("Adóptame", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary)
                             }
+
                         }
                     }
                 }
