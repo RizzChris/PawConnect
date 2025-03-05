@@ -5,9 +5,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.pawconnect.R
+import com.example.pawconnect.Screen
+import com.example.pawconnect.ui.screens.components.UserBottomNavBar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 
@@ -23,11 +28,33 @@ fun EditProfile(navController: NavHostController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Editar Perfil", fontSize = 20.sp) },
+                title = {
+                    Text(
+                    text = "Editar Perfil",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                ) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_huella),
+                            contentDescription = "Regresar",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
+            )
+        },
+        bottomBar = {
+            UserBottomNavBar(
+                onHuellasClick = { navController.navigate(Screen.Pets.route) },
+                onHomeClick = { navController.navigate(Screen.Home.route) },
+                onPerfilClick = { navController.navigate(Screen.Profile.route) }
             )
         }
     ) { innerPadding ->
