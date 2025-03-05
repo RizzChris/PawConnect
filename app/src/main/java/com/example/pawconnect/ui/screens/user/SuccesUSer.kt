@@ -64,7 +64,7 @@ fun SuccessUser(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    "¡este texto hay que corregirlo!",
+                    "¡Tu solicitud ya se esta procesando!",
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
                 )
@@ -72,7 +72,7 @@ fun SuccessUser(navController: NavController) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    " este texto hay que corregirlo",
+                    "Estate atento a tu correo para recibir más información",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
@@ -87,7 +87,7 @@ fun SuccessUser(navController: NavController) {
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Iniciar sesión", fontSize = 16.sp)
+                    Text("Terminar", fontSize = 16.sp)
                 }
             }
         }
