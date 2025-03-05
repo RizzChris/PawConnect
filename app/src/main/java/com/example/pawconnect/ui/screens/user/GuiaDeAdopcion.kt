@@ -1,15 +1,31 @@
 package com.example.pawconnect.ui.screens.user
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
 import com.example.pawconnect.ui.screens.components.UserBottomNavBar
@@ -17,23 +33,6 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun GuiaDeAdopcion(navController: NavController) {
-    // Lista de imágenes para el carrusel
-    val imageList = listOf(
-        R.drawable.refugio_dogs_1,
-        R.drawable.refugio_dogs_2,
-        R.drawable.refugio_dogs_3
-    )
-    // Índice actual de la imagen mostrada
-    var currentImageIndex by remember { mutableStateOf(0) }
-
-    // Efecto para cambiar la imagen cada 5 segundos
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(5000) // Espera 5 segundos
-            currentImageIndex = (currentImageIndex + 1) % imageList.size
-        }
-    }
-    // Scaffold con bottomBar
     Scaffold(
         bottomBar = {
             UserBottomNavBar(
@@ -43,41 +42,182 @@ fun GuiaDeAdopcion(navController: NavController) {
             )
         }
     ) { innerPadding ->
-        // Contenido principal
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState()) // Permite desplazamiento
                 .padding(innerPadding)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Logo
+            Image(
+                painter = painterResource(id = R.drawable.logo_pawconnectuniendocorazonescambiandovidas),
+                contentDescription = "Logo PawConnect",
+                modifier = Modifier.size(250.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.size(30.dp) // Tamaño de la flecha
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Regresar"
+                    )
+                }
 
-                // Logo PawConnect
-                Image(
-                    painter = painterResource(id = R.drawable.logo_pawconnectuniendocorazonescambiandovidas),
-                    contentDescription = "Logo PawConnect",
-                    modifier = Modifier.size(300.dp)
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "GUÍA DE ADOPCIÓN",
+                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.Blue,
+                    fontWeight = FontWeight.Bold,
+                    //modifier = Modifier.padding(start = 12.dp) // Espaciado entre la flecha y el texto
                 )
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                // Carrusel de imágenes
-                Image(
-                    painter = painterResource(id = imageList[currentImageIndex]),
-                    contentDescription = "Carrusel Refugio",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
-                )
-                // Empuja la barra inferior al final
-                Spacer(modifier = Modifier.weight(1f))
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Descubre cómo puedes cambiar una vida y encontrar un amigo para siempre",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Sección "¿Por qué adoptar?"
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFD4C3FC)) // Color lila
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_qm),
+                        contentDescription = "Question Mark",
+                        modifier = Modifier.size(32.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Column {
+                        Text(
+                            text = "¿Por qué adoptar?",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "Al adoptar no solo cambias la vida de un animal, sino que también contribuyes a reducir el problema de mascotas sin hogar en Nuevo León.",
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Sección "Proceso de Adopción"
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF2B6DE)) // Color rosa
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Proceso de Adopción",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Paso 1 - Prepararte para adoptar
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_uc),
+                            contentDescription = "User Check",
+                            modifier = Modifier.size(32.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Column {
+                            Text(
+                                text = "Prepárate para adoptar",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = "Asegúrate de tener el tiempo, espacio y recursos necesarios para cuidar a una mascota.",
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Paso 2 - Encuentra tu compañero ideal
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_heart),
+                            contentDescription = "Heart",
+                            modifier = Modifier.size(32.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Column {
+                            Text(
+                                text = "Encuentra tu compañero ideal",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = "Explora los perfiles de mascotas y elige una que se ajuste a tu estilo de vida.",
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            val imageList = listOf(
+                R.drawable.refugio_dogs_1,
+                R.drawable.refugio_dogs_2,
+                R.drawable.refugio_dogs_3
+            )
+            var currentImageIndex by remember { mutableStateOf(0) }
+
+            LaunchedEffect(key1 = currentImageIndex) {
+                delay(5000) // Espera 5 segundos
+                currentImageIndex = (currentImageIndex + 1) % imageList.size
+            }
+
+            Image(
+                painter = painterResource(id = imageList[currentImageIndex]),
+                contentDescription = "Imagen del proceso de adopción",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
         }
     }
 }
