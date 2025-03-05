@@ -96,7 +96,7 @@ fun ProfileScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
                 // Botones de opciones
                 ProfileButton(text = "Editar perfil") { navController.navigate(Screen.EditProfileScreen.route)}
-                ProfileButton(text = "Notificaciones") { /* Acción de notificaciones */ }
+                ProfileButton(text = "Notificaciones") { navController.navigate(Screen.NotificationPreferences.route) }
                 ProfileButton(text = "Mis favoritos") { navController.navigate(Screen.Favorite.route) }
                 ProfileButton(text = "Guía de adopción") { navController.navigate(Screen.GuiaDeAdopcion.route) }
                 ProfileButton(text = "Cerrar sesión") { navController.navigate(Screen.Login.route) }

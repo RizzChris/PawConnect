@@ -29,6 +29,11 @@ import com.example.pawconnect.ui.screens.user.FormularioAdoptame
 import com.example.pawconnect.ui.screens.user.GuiaDeAdopcion
 import com.example.pawconnect.ui.screens.user.SolitudesUser
 import com.example.pawconnect.ui.screens.shelter.ShelterRequestDetailScreen
+import com.example.pawconnect.ui.screens.shelter.ShelterRevisionPetsScreen
+import com.example.pawconnect.ui.screens.shelter.ShelterCatsScreen
+import com.example.pawconnect.ui.screens.shelter.ShelterDogsScreen
+import com.example.pawconnect.ui.screens.user.SuccessUser
+import com.example.pawconnect.ui.screens.user.NotificationPreferences
 
 sealed class Screen(val route: String) {
     // Autenticación
@@ -49,6 +54,8 @@ sealed class Screen(val route: String) {
     object FormularioAdoptame : Screen("formulario_adoptame")
     object GuiaDeAdopcion: Screen("guia_de_adopcion")
     object EditProfileScreen: Screen("editar_perfil")
+    object SuccessUser: Screen("success_user")
+    object NotificationPreferences: Screen("notificaciones")
 
     // Refugio
     object ShelterHome : Screen("shelter_home")
@@ -59,11 +66,14 @@ sealed class Screen(val route: String) {
     object ShelterSuccess : Screen("shelter_success")
     object ShelterPruebas : Screen("shelter_pruebas")
     object ShelterRequestDetail : Screen("shelter_request_detail/{requestId}")
+    object ShelterRevisionPetsScreen : Screen("shelter_revision_pets")
 
 
     // Otros
     object PlantillaRefugio : Screen("plantilla_refugio")
     object PlantillaUsers : Screen("plantilla_users")
+    object ShelterCatsScreen : Screen("shelter_cats_screen")
+    object ShelterDogsScreen : Screen("shelter_dogs_screen")
 }
 
 @Composable
@@ -98,8 +108,8 @@ fun AppNavigation(navController: NavHostController) {
             val petId = backStackEntry.arguments?.getString("petId") ?: ""
             FormularioAdoptame(navController, petId)
         }
-
-
+        composable(Screen.SuccessUser.route) { SuccessUser(navController) }
+        composable(Screen.NotificationPreferences.route) {NotificationPreferences(navController) }
 
         // Refugio
         composable(Screen.ShelterHome.route) { ShelterHomeScreen(navController) }
@@ -118,6 +128,9 @@ fun AppNavigation(navController: NavHostController) {
             val requestId = backStackEntry.arguments?.getString("requestId") ?: ""
             ShelterRequestDetailScreen(navController, requestId)
         }
+        composable(Screen.ShelterRevisionPetsScreen.route) { ShelterRevisionPetsScreen(navController) }
+        composable(Screen.ShelterCatsScreen.route) { ShelterCatsScreen(navController) }
+        composable(Screen.ShelterDogsScreen.route) { ShelterDogsScreen(navController) }
 
     }
 }

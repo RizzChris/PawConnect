@@ -1,49 +1,30 @@
 package com.example.pawconnect.ui.screens.shelter
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
-import com.example.pawconnect.repository.AdoptionRequest
-import com.example.pawconnect.repository.AdoptionRequestsRepository
 import com.example.pawconnect.ui.screens.components.ShelterBottomNavBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShelterPetsScreen(navController: NavController) {
-    var requestsList by remember { mutableStateOf<List<AdoptionRequest>>(emptyList()) }
-    var loading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    // Cargar solicitudes pendientes al iniciar
-    LaunchedEffect(Unit) {
-        AdoptionRequestsRepository.fetchPendingRequests { success, list, error ->
-            if (success) {
-                requestsList = list
-            } else {
-                errorMessage = error ?: "Error desconocido"
-            }
-            loading = false
-        }
-    }
-
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Solicitudes pendientes - Refugio") }
-            )
-        },
         bottomBar = {
             // Barra de navegación inferior (NavBar)
             ShelterBottomNavBar(
@@ -53,84 +34,89 @@ fun ShelterPetsScreen(navController: NavController) {
             )
         }
     ) { innerPadding ->
+        // Contenedor principal
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when {
-                loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-                errorMessage.isNotEmpty() -> {
-                    Text(text = errorMessage, modifier = Modifier.align(Alignment.Center))
-                }
-                requestsList.isEmpty() -> {
-                    Text(
-                        text = "No hay solicitudes pendientes.",
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-                else -> {
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(requestsList) { request ->
-                            RequestItemCard(request) {
-                                // Acción al pulsar "Revisar"
-                                // pantalla de detalle de la solicitud
-                                navController.navigate("ShelterRequestDetail/${request.requestId}")
+            // Columna que contendrá el logo, los botones y el cuadro gris
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 15.dp, start = 16.dp, end = 16.dp), // 15 dp desde arriba
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                // Logo PawConnect, más grande y clickeable
+                Image(
+                    painter = painterResource(id = R.drawable.logo_pawconnectuniendocorazonescambiandovidas),
+                    contentDescription = "Logo PawConnect",
+                    modifier = Modifier
+                        .fillMaxWidth()         // Ocupa todo el ancho disponible
+                        .height(100.dp)         // Aumenta la altura para hacerlo más grande
+                        .clickable {
+                            // Navegar a ShelterHome
+                            navController.navigate(Screen.ShelterHome.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
                             }
                         }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Fila de botones ("perros", "Gatos", "registrar")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp) // Espacio entre botones
+                ) {
+                    // Botón "perros"
+                    Button(
+                        onClick = { navController.navigate(Screen.ShelterDogsScreen.route) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                    ) {
+                        Text("perros", fontSize = 16.sp)
+                    }
+
+                    // Botón "Gatos"
+                    Button(
+                        onClick = { navController.navigate(Screen.ShelterCatsScreen.route) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                    ) {
+                        Text("Gatos", fontSize = 16.sp)
+                    }
+
+                    // Botón "registrar"
+                    Button(
+                        onClick = { navController.navigate(Screen.ShelterRegistrationPets.route) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                    ) {
+                        Text("registrar", fontSize = 16.sp)
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Cuadro gris grande hasta el fondo
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)                   // Ocupa todo el espacio vertical restante
+                        .background(Color.Gray, shape = RoundedCornerShape(16.dp))
+                )
             }
         }
     }
 }
-
-@Composable
-fun RequestItemCard(request: AdoptionRequest, onClickReview: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Podrías poner una imagen del usuario, o un icono
-            Image(
-                painter = painterResource(id = R.drawable.icon_user),
-                contentDescription = "Usuario",
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = request.userName,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "La solicitud de adopción se encuentra pendiente. Favor de revisarla.",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Button(onClick = onClickReview) {
-                Text("Revisar")
-            }
-        }
-    }
-}
-
