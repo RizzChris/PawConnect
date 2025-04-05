@@ -16,7 +16,7 @@ import com.example.pawconnect.Screen
 import com.example.pawconnect.repository.PetData
 import com.example.pawconnect.repository.fetchPetsBySpecies
 import com.example.pawconnect.ui.screens.components.PetCard
-import com.example.pawconnect.ui.screens.components.UserBottomNavBar
+import com.example.pawconnect.ui.screens.components.ShelterBottomNavBar
 
 
 @Composable
@@ -38,10 +38,11 @@ fun ShelterDogsScreen(navController: NavController) {
 
     Scaffold(
         bottomBar = {
-            UserBottomNavBar(
-                onHuellasClick = { navController.navigate(Screen.Pets.route) },
-                onHomeClick = { navController.navigate(Screen.Home.route) },
-                onPerfilClick = { navController.navigate(Screen.Profile.route) }
+            // Barra de navegación inferior (NavBar)
+            ShelterBottomNavBar(
+                onHuellasClick = { navController.navigate(Screen.ShelterPets.route) },
+                onHomeClick = { navController.navigate(Screen.ShelterHome.route) },
+                onPerfilClick = { navController.navigate(Screen.ShelterProfile.route) }
             )
         }
     ) { innerPadding ->

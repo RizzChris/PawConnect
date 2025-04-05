@@ -92,7 +92,8 @@ fun ShelterHomeScreen(navController: NavController) {
                 // Mensaje de bienvenida
                 Text(
                     text = "Bienvenid@: Patitas de amor",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -113,5 +114,3 @@ fun ShelterHomeScreen(navController: NavController) {
         }
     }
 }
-
-

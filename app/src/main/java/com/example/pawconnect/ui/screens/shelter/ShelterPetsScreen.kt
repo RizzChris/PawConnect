@@ -21,9 +21,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.pawconnect.R
 import com.example.pawconnect.Screen
 import com.example.pawconnect.ui.screens.components.ShelterBottomNavBar
+import androidx.compose.runtime.*
+
 
 @Composable
 fun ShelterPetsScreen(navController: NavController) {
+    val errorMessage by remember { mutableStateOf("") }
     Scaffold(
         bottomBar = {
             // Barra de navegación inferior (NavBar)
@@ -77,9 +80,9 @@ fun ShelterPetsScreen(navController: NavController) {
                             .weight(1f)
                             .height(60.dp)
                             .clip(RoundedCornerShape(12.dp)),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("perros", fontSize = 16.sp)
+                        Text("Perros", fontSize = 16.sp)
                     }
 
                     // Botón "Gatos"
@@ -89,22 +92,22 @@ fun ShelterPetsScreen(navController: NavController) {
                             .weight(1f)
                             .height(60.dp)
                             .clip(RoundedCornerShape(12.dp)),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text("Gatos", fontSize = 16.sp)
                     }
 
-                    // Botón "registrar"
-                    Button(
-                        onClick = { navController.navigate(Screen.ShelterRegistrationPets.route) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(60.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
-                    ) {
-                        Text("registrar", fontSize = 16.sp)
-                    }
+//                    // Botón "registrar"
+//                    Button(
+//                        onClick = { navController.navigate(Screen.ShelterRegistrationPets.route) },
+//                        modifier = Modifier
+//                            .weight(1f)
+//                            .height(60.dp)
+//                            .clip(RoundedCornerShape(12.dp)),
+//                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+//                    ) {
+//                        Text("Registrar", fontSize = 16.sp)
+//                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -114,9 +117,81 @@ fun ShelterPetsScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)                   // Ocupa todo el espacio vertical restante
-                        .background(Color.Gray, shape = RoundedCornerShape(16.dp))
-                )
+                        .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(16.dp))
+                ){
+
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {// Título
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Registrar",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+                        // Ícono de la encuesta
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_encuesta),
+                            contentDescription = "Icono de la encuesta",
+                            modifier = Modifier.size(64.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Descripción de la encuesta
+                        Text(
+                            text = "Para continuar con el proceso de registro, será necesario llenar una encuesta.\n\n" +
+                                    "La encuesta tiene como objetivo, recolectar información acerca de la mascota, así como algunos detalles.\n\n" +
+                                    "Cuando se encuentre listo, de clic en 'Comenzar encuesta'.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // Botón "Comenzar encuesta"
+                        Button(
+                            onClick = {
+                                navController.navigate(Screen.ShelterFormularioPets.route)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D80))
+                        ) {
+                            Text("Comenzar encuesta", fontSize = 16.sp)
+                        }
+                        // Mostrar mensaje de error
+
+                        if (errorMessage.isNotEmpty()) {
+                            Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
+                        }
+                    }
+                }
             }
         }
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun ShelterPetsScreenPreview() {
+    val navController = rememberNavController()
+    ShelterPetsScreen(navController)
+}
+
+
+
+
+

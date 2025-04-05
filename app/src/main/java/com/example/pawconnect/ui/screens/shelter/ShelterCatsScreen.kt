@@ -17,7 +17,6 @@ import com.example.pawconnect.repository.PetData
 import com.example.pawconnect.repository.fetchPetsBySpecies
 import com.example.pawconnect.ui.screens.components.PetCard
 import com.example.pawconnect.ui.screens.components.UserBottomNavBar
-import com.google.firebase.firestore.FirebaseFirestore
 
 
 
