@@ -66,7 +66,7 @@ fun ShelterProfileScreen(navController: NavController) {
                 title = { Text("Mi Perfil", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -91,7 +91,7 @@ fun ShelterProfileScreen(navController: NavController) {
             // Logo y lema
             Text("PAWCONNECT", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("Uniendo corazones, cambiando vidas", fontSize = 14.sp, color = Color.Gray)
+            Text("Uniendo corazones, cambiando vidas", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(24.dp))
 
             // Card con información del perfil
@@ -100,7 +100,7 @@ fun ShelterProfileScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
@@ -112,7 +112,7 @@ fun ShelterProfileScreen(navController: NavController) {
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(Color.LightGray),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = "👤", fontSize = 40.sp)
@@ -126,7 +126,7 @@ fun ShelterProfileScreen(navController: NavController) {
                         errorMessage.isNotEmpty() -> Text(errorMessage, color = Color.Red)
                         else -> {
                             Text(text = name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                            Text(text = email, fontSize = 14.sp, color = Color.Gray)
+                            Text(text = email, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 }
@@ -135,11 +135,11 @@ fun ShelterProfileScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             // Separador
-            Divider(thickness = 1.dp, color = Color.LightGray)
+            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(16.dp))
 
             // Botones de opciones
-            ProfileButton("Revision de Pets") { navController.navigate(Screen.ShelterRevisionPetsScreen.route) }
+            ProfileButton("Revision de solicitudes") { navController.navigate(Screen.ShelterRevisionPetsScreen.route) }
             Spacer(modifier = Modifier.height(8.dp))
             ProfileButton("Guía de adopción") { navController.navigate(Screen.GuiaDeAdopcion.route) }
             Spacer(modifier = Modifier.height(8.dp))

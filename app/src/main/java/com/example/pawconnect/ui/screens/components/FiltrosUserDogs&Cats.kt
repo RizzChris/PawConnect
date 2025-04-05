@@ -37,7 +37,7 @@ fun FiltrosContent(
         Text(text = "Filtrar por Tamaño", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         RadioGroup(
-            options = listOf("chico", "mediano", "grande"),
+            options = listOf("Chico", "Mediano", "Grande"),
             selectedOption = tamanoSeleccionado,
             onOptionSelected = { tamanoSeleccionado = it }
         )
@@ -48,7 +48,7 @@ fun FiltrosContent(
         Text(text = "Filtrar por Género", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         RadioGroup(
-            options = listOf("macho", "hembra"),
+            options = listOf("Macho", "Hembra"),
             selectedOption = generoSeleccionado,
             onOptionSelected = { generoSeleccionado = it }
         )

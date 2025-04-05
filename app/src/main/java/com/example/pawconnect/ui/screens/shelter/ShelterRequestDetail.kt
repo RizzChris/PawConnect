@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.pawconnect.R
@@ -33,7 +34,6 @@ fun ShelterRequestDetailScreen(navController: NavController, requestId: String) 
     // Cargar la solicitud
     LaunchedEffect(requestId) {
         if (requestId.isNotBlank()) {
-            // 1) Obtener la solicitud desde "adoptionRequests"
             val db = FirebaseFirestore.getInstance()
             val docRef = db.collection("adoptionRequests").document(requestId)
             docRef.get()
@@ -42,7 +42,6 @@ fun ShelterRequestDetailScreen(navController: NavController, requestId: String) 
                         val adoptionReq = snapshot.toObject(AdoptionRequest::class.java)
                         if (adoptionReq != null) {
                             request = adoptionReq
-                            // Luego obtenemos la mascota
                             loadPet(adoptionReq.petId) { petData, error ->
                                 if (petData != null) {
                                     pet = petData
@@ -72,16 +71,27 @@ fun ShelterRequestDetailScreen(navController: NavController, requestId: String) 
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Revisar Solicitud") },
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Detalles de Solicitud",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.icon_huella),
-                            contentDescription = "Regresar"
+                            contentDescription = "Regresar",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     ) { innerPadding ->
@@ -99,120 +109,219 @@ fun ShelterRequestDetailScreen(navController: NavController, requestId: String) 
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
-                request != null -> {
-                    // Muestra los datos
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        // Muestra la mascota (pet) si se cargó
-                        if (pet != null) {
-                            // Imagen de la mascota
-                            val painter = rememberAsyncImagePainter(
-                                model = pet!!.petPhoto,
-                                fallback = painterResource(R.drawable.my_placeholder),
-                                error = painterResource(R.drawable.my_placeholder)
-                            )
-                            Image(
-                                painter = painter,
-                                contentDescription = pet!!.petName,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(16.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                            // Nombre de la mascota
-                            Text(
-                                text = pet!!.petName,
-                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                            )
-                        } else {
-                            Text("No se encontró la mascota", color = MaterialTheme.colorScheme.error)
-                        }
-
-                        // Datos del usuario y la solicitud
-                        Text(
-                            text = "Datos del adoptante",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text("Nombre: ${request!!.userName} ${request!!.userSurname}")
-                        Text("Edad: ${request!!.userAge}")
-                        Text("Correo: ${request!!.userEmail}")
-                        Text("Teléfono: ${request!!.userPhone}")
-
-                        Text(
-                            text = "Motivo de adopción",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(request!!.reason)
-
-                        Text(
-                            text = "Datos del entorno",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        // Ejemplo: ¿Actualmente tienes otros animales?
-                        Text("¿Actualmente tienes otros animales? " +
-                                if (request!!.currentlyHasPets) "Sí" else "No")
-                        Text("¿Anteriormente has tenido animales? " +
-                                if (request!!.previouslyHadPets) "Sí" else "No")
-                        Text("¿Cuántas personas viven en tu casa?: ${request!!.peopleInHouse}")
-                        Text("¿Todos en tu hogar están de acuerdo en adoptar? " +
-                                if (request!!.allAgree) "Sí" else "No")
-                        Text("¿Hay niños en casa?: " + if (request!!.hasKids) "Sí" else "No")
-                        Text("¿Vives en casa propia?: " + if (request!!.ownHouse) "Sí" else "No")
-                        if (!request!!.ownHouse) {
-                            Text("¿Tus arrendadores permiten mascotas?: " +
-                                    if (request!!.landlordAllows) "Sí" else "No")
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Botones para aprobar o rechazar
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Button(
-                                onClick = {
-                                    // Llamamos a updateRequestStatus con "aprobada"
-                                    AdoptionRequestsRepository.updateRequestStatus(request!!.requestId, "aprobada") { success, error ->
-                                        if (success) {
-                                            // Podrías mostrar un snackbar, o simplemente:
-                                            navController.popBackStack()
-                                        } else {
-                                            errorMessage = error ?: "Error al aprobar la solicitud."
-                                        }
-                                    }
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-                            ) {
-                                Text("Aceptar")
+                request != null && pet != null -> {
+                    RequestDetailsContent(
+                        request = request!!,
+                        pet = pet!!,
+                        onAccept = {
+                            AdoptionRequestsRepository.updateRequestStatus(request!!.requestId, "aprobada") { success, error ->
+                                if (success) {
+                                    navController.popBackStack()
+                                } else {
+                                    errorMessage = error ?: "Error al aprobar la solicitud."
+                                }
                             }
-                            Button(
-                                onClick = {
-                                    // Llamamos a updateRequestStatus con "rechazada"
-                                    AdoptionRequestsRepository.updateRequestStatus(request!!.requestId, "rechazada") { success, error ->
-                                        if (success) {
-                                            navController.popBackStack()
-                                        } else {
-                                            errorMessage = error ?: "Error al rechazar la solicitud."
-                                        }
-                                    }
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
-                            ) {
-                                Text("Rechazar")
+                        },
+                        onReject = {
+                            AdoptionRequestsRepository.updateRequestStatus(request!!.requestId, "rechazada") { success, error ->
+                                if (success) {
+                                    navController.popBackStack()
+                                } else {
+                                    errorMessage = error ?: "Error al rechazar la solicitud."
+                                }
                             }
                         }
-                    }
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun RequestDetailsContent(
+    request: AdoptionRequest,
+    pet: PetData,
+    onAccept: () -> Unit,
+    onReject: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Tarjeta de la mascota
+        PetCard(pet)
+
+        // Tarjeta de información del adoptante
+        AdopterInfoCard(request)
+
+        // Tarjeta de motivo de adopción
+        AdoptionReasonCard(request)
+
+        // Tarjeta de entorno familiar
+        LivingEnvironmentCard(request)
+
+        // Botones de acción
+        ActionButtons(onAccept, onReject)
+    }
+}
+
+@Composable
+private fun PetCard(pet: PetData) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Imagen de la mascota
+            val painter = rememberAsyncImagePainter(
+                model = pet.petPhoto,
+                fallback = painterResource(R.drawable.my_placeholder),
+                error = painterResource(R.drawable.my_placeholder)
+            )
+            Image(
+                painter = painter,
+                contentDescription = pet.petName,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            // Información de la mascota
+            Text(
+                text = "Mascota para adopción",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = pet.petName,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AdopterInfoCard(request: AdoptionRequest) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Información del adoptante",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(text = "Nombre: ${request.userName} ${request.userSurname}")
+            Text(text = "Edad: ${request.userAge}")
+            Text(text = "Correo: ${request.userEmail}")
+            Text(text = "Teléfono: ${request.userPhone}")
+        }
+    }
+}
+
+@Composable
+private fun AdoptionReasonCard(request: AdoptionRequest) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Motivo de adopción",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = request.reason,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun LivingEnvironmentCard(request: AdoptionRequest) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Entorno familiar",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(text = "Actualmente tiene otros animales: ${if (request.currentlyHasPets) "Sí" else "No"}")
+            Text(text = "Ha tenido animales antes: ${if (request.previouslyHadPets) "Sí" else "No"}")
+            Text(text = "Personas en el hogar: ${request.peopleInHouse}")
+            Text(text = "Todos están de acuerdo en adoptar: ${if (request.allAgree) "Sí" else "No"}")
+            Text(text = "Niños en casa: ${if (request.hasKids) "Sí" else "No"}")
+            Text(text = "Vive en casa propia: ${if (request.ownHouse) "Sí" else "No"}")
+
+            if (!request.ownHouse) {
+                Text(text = "Arrendador permite mascotas: ${if (request.landlordAllows) "Sí" else "No"}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActionButtons(onAccept: () -> Unit, onReject: () -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Button(
+            onClick = onAccept,
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Text("Aprobar", style = MaterialTheme.typography.labelLarge)
+        }
+
+        Button(
+            onClick = onReject,
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer
+            ),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Text("Rechazar", style = MaterialTheme.typography.labelLarge)
         }
     }
 }

@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,21 +43,21 @@ fun ShelterRevisionPetsScreen(navController: NavController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Revision de Solicitudes", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                title = {
+                    Text("Revision de Solicitudes", fontSize = 20.sp, fontWeight = FontWeight.Bold)},
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
         bottomBar = {
-            // Barra de navegación inferior (NavBar)
             ShelterBottomNavBar(
                 onHuellasClick = { navController.navigate(Screen.ShelterPets.route) },
                 onHomeClick = { navController.navigate(Screen.ShelterHome.route) },
                 onPerfilClick = { navController.navigate(Screen.ShelterProfile.route) }
             )
-        }
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier
